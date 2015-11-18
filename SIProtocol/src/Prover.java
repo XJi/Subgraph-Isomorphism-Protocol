@@ -64,9 +64,6 @@ public class Prover {
 	 public static void main(String args[]){
 	     try {
 	         String host = "localhost";
-	         /* Get the server address from a dialog box.
-	            If prover and verifier are running on the 
-	            same iOS machine, leave IPAddress empty*/
 	         socket = new Socket("",6077);
 	        /* JFrame f = new JFrame();
 	         JFileChooser fc = new JFileChooser();
@@ -79,6 +76,11 @@ public class Prover {
 				 f.setVisible(true);
 				 
 			 }*/
+	         /*TODO: 
+	          * Reading G1, G2 using JFileChooser
+	          * Generate Q, which is a permutation of G2. 
+	          * Error handling/Interrupts if reading adj matrix fails
+	          */
 	         matrix = FileReader.readGraph("/g1"); //Hardcoded this... Should be commitment(Q). 
 	         String buffer = convertToString(matrix);
 	         String sendMessage = buffer + "\n";
