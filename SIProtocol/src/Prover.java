@@ -67,10 +67,7 @@ public class Prover {
 	         /* Get the server address from a dialog box.
 	            If prover and verifier are running on the 
 	            same iOS machine, leave IPAddress empty*/
-	         String serverAddress = JOptionPane.showInputDialog(
-	                    "Enter IP Address of a machine that is\n" +
-	                    "If it's running on iOS terminal, leave it empty");
-	         socket = new Socket(serverAddress, 6077);
+	         socket = new Socket("",6077);
 	        /* JFrame f = new JFrame();
 	         JFileChooser fc = new JFileChooser();
 	         int ret = fc.showOpenDialog(f);
@@ -82,7 +79,7 @@ public class Prover {
 				 f.setVisible(true);
 				 
 			 }*/
-	         matrix = FileReader.readGraph("/g1");
+	         matrix = FileReader.readGraph("/g1"); //Hardcoded this... Should be commitment(Q). 
 	         String buffer = convertToString(matrix);
 	         String sendMessage = buffer + "\n";
 	         OutputStream os = socket.getOutputStream();
