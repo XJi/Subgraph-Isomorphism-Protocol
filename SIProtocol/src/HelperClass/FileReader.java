@@ -13,7 +13,7 @@ public class FileReader {
 	 * 
 	 * Return 2D adjacency matrix 
 	 */
-	public static int[][] readGraph(String filePath) throws IOException{
+	public int[][] readGraph(String filePath) throws IOException{
 		InputStream is = FileReader.class.getResourceAsStream(filePath);
 		BufferedReader br = new BufferedReader(new InputStreamReader(is));
 		ArrayList<String> input = new ArrayList<>();
