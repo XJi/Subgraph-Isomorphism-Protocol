@@ -5,26 +5,26 @@ import java.util.Random;
 public class MatrixOps {
 	
 	// Given graph, convert to String
-		public static String convertToString(int[][] matrix){
-			 String buffer = "";
-			 int length = matrix[0].length;
-			 for(int i = 0; i < length; i++){
-				 for(int j = 0; j < length; j++)
-					 buffer += matrix[i][j];
-			 }
-			 return buffer;
-		 }
-		
-		// Given a string matrix like from a file, convert to matrix
-		public static int[][] convertToMatrix(String buffer){	
-			int size = (int)Math.sqrt(buffer.length());
-			int[][] adjMatrix = new int[size][size];
-			for(int i = 0; i < size; i++){
-				for(int j = 0; j < size; j++)
-					adjMatrix[i][j] = (int)buffer.charAt(i*size+j);
-			}
-			return adjMatrix;
+	public static String convertToString(int[][] matrix){
+		String buffer = "";
+		int length = matrix[0].length;
+		for(int i = 0; i < length; i++){
+			for(int j = 0; j < length; j++)
+				buffer += matrix[i][j];
 		}
+		return buffer;
+	}
+		
+	// Given a string matrix like from a file, convert to matrix
+	public static int[][] convertToMatrix(String buffer){	
+		int size = (int)Math.sqrt(buffer.length());
+		int[][] adjMatrix = new int[size][size];
+		for(int i = 0; i < size; i++){
+			for(int j = 0; j < size; j++)
+				adjMatrix[i][j] = (int)buffer.charAt(i*size+j);
+		}
+		return adjMatrix;
+	}
 		
 		
 	
@@ -104,10 +104,6 @@ public class MatrixOps {
         return C;
     }
 	
-    // matrix write to file
-    public static void matrix_write(int[][] A){
-    	
-    }
     // print to screen matrix
     public static void matrix_print(int[][] A){
     	for(int i = 0; i < A[0].length;i++){
@@ -155,6 +151,37 @@ public class MatrixOps {
     	return P;
     }
     
+    //==================================================
+    // Generate removal matrix to remove rows/columns
+    public static int[][] generateRemovalMatrix(int n) {
+		
+	// Generate array from 0 to n-1
+	ArrayList<Integer> range = new ArrayList<Integer>();
+
+	for(int i = 0; i < n; i++) {
+		range.add(i);
+	}
+
+	// Generate which 1's to keep in removal matrix
+	Random r = new Random();
+	ArrayList<Integer> removalArrayList = new ArrayList<Integer>();
+	
+	for(int i = 0; i < (3*n)/4; i++){
+		int index = r.nextInt(range.size());
+		removalArrayList.add(range.get(index));
+		range.remove(index);
+	}
+
+	// Generate removal matrix
+	int[][] removalMatrix = new int[n][n];
+	for(int i = 0; i < removalArrayList.size(); i++) {
+		int index = removalArrayList.get(i);
+		removalMatrix[index][index] = 1;
+	}
+
+	return removalMatrix;
+    	
+    }
     
     //==================================================
     // Intake an adjacency matrix A and permutation matrix P and return a permuted Adjacency matrix
@@ -167,10 +194,30 @@ public class MatrixOps {
     	return B;
     }
     
+    // Returns random subgraph of a given matrix A
+    public static int[][] subgraph(int[][] A) {
+    	
+    	int[][] removalMatrix = generateRemovalMatrix(A[0].length);
+    	
+    	int[][] subgraph = multiply(removalMatrix, A);
+	subgraph = multiply(subgraph, removalMatrix);
+
+	return subgraph;
+    	
+    }
+   /*
+	// Main method for testing
     public static void main(String []args){
-		/*int m = 3;
-		int[][] G = new int[m][m];
-		G = fill(G,0.5);
-		permute(G);*/
+		int[][] G = new int[8][8];
+		G = fill(G,0.7);
+		int[][] Pmat = perm_mat(8);
+		int[][] P = permute(G, Pmat);
+		System.out.println("Permuted matrix:");
+		matrix_print(P);
+		//System.out.println("Removal matrix:");
+		//matrix_print(generateRemovalMatrix(P));
+		//System.out.println("Subgraph:");
+		matrix_print(subgraph(P));
 	}
+	*/
 }
