@@ -18,7 +18,8 @@ import HelperClass.FileReader;
 
 public class Prover {
 	 private static Socket socket;
-	 static int[][] matrix;
+	 static int[][] g1;
+	 static int[][] g2;
 	 /* TODO: change Q to the "real" adjacency matrix( OR
 	  * any graph structure based on isomorphism implementations)
 	  * variable called "perm" is the permutation, which doesn't 
@@ -38,6 +39,7 @@ public class Prover {
 	  *        
 	  */
 	 static int[][] Q = new int[10][10]; //TODO
+	 static int[][] commitment_Q = new int[10][10]; //TODO
 	 static String perm = "Way of generating a random permutation"; //TODO
 	 static String pi = "random stuff..."; //TODO pi for computing Q'
 	 static String subQ = "subgraph of Q"; //TODO
@@ -76,14 +78,20 @@ public class Prover {
 				 f.setVisible(true);
 				 
 			 }*/
-	         /*TODO: 
-	          * Reading G1, G2 using JFileChooser
-	          * Generate Q, which is a permutation of G2. 
-	          * Error handling/Interrupts if reading adj matrix fails
+	         g1 = FileReader.readGraph("/g1"); //Hardcoded this... 
+	         String buffer_g1 = convertToString(g1);
+	         g2 = FileReader.readGraph("/g2"); //Hardcoded this... Temperarily g1 is the same as g2
+	         String buffer_g2 = convertToString(g2);
+	         /* TODO:
+	          * permutation operation
+	          * Q = permutation(g2)
 	          */
-	         matrix = FileReader.readGraph("/g1"); //Hardcoded this... Should be commitment(Q). 
-	         String buffer = convertToString(matrix);
-	         String sendMessage = buffer + "\n";
+	         
+	         /* TODO:
+	          * Commitment operation
+	          * Q’ = Commitment(Q)
+	          */
+	         String sendMessage = convertToString(commitment_Q) + "\n";
 	         OutputStream os = socket.getOutputStream();
 	         OutputStreamWriter osw = new OutputStreamWriter(os);
 	         BufferedWriter bw = new BufferedWriter(osw);
@@ -98,8 +106,9 @@ public class Prover {
 	         System.out.println("Message received from the verifier : " + bitStr);
 	         int bit = Integer.parseInt(bitStr);
 	         if(bit == 0){
-	        	 // Sending a and Q
+	        	 // Sending a
 	        	 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+	        	 //TODO: apply permutation a to g2 to get Q, compare Q with the commitment of Q
 	             out.println(perm);
 	             out.println(Q);	
 	         }
