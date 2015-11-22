@@ -4,9 +4,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import HelperClass.Communication;
-import HelperClass.FileReader;
 import HelperClass.MatrixOps;
 import HelperClass.graph_hash;
+import HelperClass.FileReader;
 
 /**
  * In Subgraph Isomorphism Protocol, verifier runs Server 
@@ -28,7 +28,7 @@ public class Verifier {
 	
 	
 	
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         ServerSocket serverSocket = new ServerSocket(SERVERPORT);
         g1 = FileReader.readGraph("/g1");
         g2 = FileReader.readGraph("/g2");
