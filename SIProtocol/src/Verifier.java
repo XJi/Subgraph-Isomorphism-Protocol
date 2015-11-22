@@ -1,7 +1,9 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Date;
+
+import HelperClass.Communication;
+import HelperClass.MatrixOps;
 
 /**
  * In Subgraph Isomorphism Protocol, verifier runs Server 
@@ -16,42 +18,6 @@ public class Verifier {
 	private static Socket socket;
 	private static int SERVERPORT = 6077;
 	
-	/**
-	 * Receive commitment(Q) from the prover
-	 * @param Socket
-	 * @throws IOException
-	 * @return String of the data received from prover 
-	 */
-	public static String receiveBuffer(Socket socket){
-		try{
-			InputStream is = socket.getInputStream();
-	        InputStreamReader isr = new InputStreamReader(is);
-	        BufferedReader br = new BufferedReader(isr);
-	        String buffer = br.readLine();
-	        System.out.println("Message received from prover is "+ buffer);
-	        return buffer;
-		}
-		catch (Exception e){
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	
-	/**
-	 * Convert the received buffer to an adjacency matrix
-	 * @param buffer
-	 * @return 2D adjacency matrix
-	 */
-	public static int[][] convertToMatrix(String buffer){	
-		int size = (int)Math.sqrt(buffer.length());
-		int[][] adjMatrix = new int[size][size];
-		for(int i = 0; i < size; i++){
-			for(int j = 0; j < size; j++)
-				adjMatrix[i][j] = (int)buffer.charAt(i*size+j);
-		}
-		return adjMatrix;
-	}
 	
 	
     public static void main(String[] args) throws IOException {
@@ -61,15 +27,20 @@ public class Verifier {
             	socket = serverSocket.accept();
             	System.out.println("Accept.\n"
             			+ "Request the commitment of Q");
+            	
             	/* Receive commitment(Q) */
-                String s = receiveBuffer(socket);
+                String s = Communication.receiveBuffer(socket);
+                
                 // Get commitment Q from the prover
-                int[][] commitmentQ = convertToMatrix(s);
+                int[][] commitmentQ = MatrixOps.convertToMatrix(s);
+                
+                /*Send a random bit to prover and wait for prover's reply*/
                 int bit = (int)(Math.random()+0.5);
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                 out.println(bit+"\n");
-                String verify = receiveBuffer(socket);
-                System.out.println("Need to verify; "+verify);
+                
+                String verify = Communication.receiveBuffer(socket);
+                System.out.println("Need to verify: "+verify);
                 
                 
             }

@@ -8,13 +8,20 @@
  *      1: request pi and Q' such that Q' = pi(G1)
  *  3. 	Verify the data received from Prover
  */
-
+/* TODO: WILL CLEAN UP THIS MESS TOMORROW AFTERNOON; 
+ * DO NOT TOUCH THIS CODE ON MASTER BEFORE THE MEETING; 
+ * TRY TO CALL HELPER FUNCTIONS AS MUSH AS YOU CAN TO REDUCE
+ *     THE LENGTH OF THE CODE AND MAKE IT MORE READABLE, BECAUSE WE ARE LAZY :P;
+ * I'M GONNA GO TO SLEEP ZZZ...
+ */
 import java.io.*;
 import java.net.Socket;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import HelperClass.*;
+import java.util.Scanner;
+
+import HelperClass.Communication;
+import HelperClass.FileReader;
+import HelperClass.GraphHash;
+import HelperClass.MatrixOps;
 
 
 public class Prover {
@@ -44,34 +51,9 @@ public class Prover {
 	 static String subQ = "subgraph of Q"; //TODO
 	 
 	 
-	 /**
-	  * Convert an adjacency matrix to string before sending
-	  * it to the verifier
-	  * @param matrix
-	  * @return string
-	  */
-	 public static String convertToString(int[][] matrix){
-		 String buffer = "";
-		 int length = matrix[0].length;
-		 for(int i = 0; i < length; i++){
-			 for(int j = 0; j < length; j++)
-				 buffer += matrix[i][j];
-		 }
-		 return buffer;
-	 }
-	 
-	 
-	 
 	 public static void main(String args[]){
 	     try {
-	         String host = "localhost";
-	         /* Get the server address from a dialog box.
-	            If prover and verifier are running on the 
-	            same iOS machine, leave IPAddress empty*/
-	         String serverAddress = JOptionPane.showInputDialog(
-	                    "Enter IP Address of a machine that is\n" +
-	                    "If it's running on iOS terminal, leave it empty");
-	         socket = new Socket(serverAddress, 6077);
+	         socket = new Socket("", 6077);
 	        /* JFrame f = new JFrame();
 	         JFileChooser fc = new JFileChooser();
 	         int ret = fc.showOpenDialog(f);
@@ -90,30 +72,16 @@ public class Prover {
 //===========================================================================================
 	         
 	         //Intake size n from user
-	         int n = 10;
-	         
+	         Scanner in = new Scanner(System.in);
+	         System.out.println("Enter the size of the adjacency matrix or enter 0 for reading given files\n");
+	         int matrixSize =Integer.parseInt(in.nextLine());
 //============================================================================================	         
 	         // Generate G2
-	         int[][] pre_G2 = new int[n][n];
-	         int[][] G2 = matrixops.fill(pre_G2,0.7);
-	         
-//============================================================================================
-	         // Store G2
-	         File G2F = new File("/graph2.txt");
-	         try{
-	        	 if(!G2F.exists()){
-	        		 G2F.createNewFile();
-	        	 }
-	         catch(IOException e){
-	        	 e.printStackTrace();
-	         }
-	         
-	         PrintWriter pw = new PrintWriter(G2F.getName());
+	         int[][] pre_G2 = new int[matrixSize][matrixSize];
+	         int[][] G2 = MatrixOps.fill(pre_G2,0.7);
 	         String G2_string = MatrixOps.convertToString(G2);
-	         pw.println(G2_string);
-	         pw.close();
-	         
-	         
+	         Communication.sendBuffer(socket,G2_string);
+
 //===============================================================================================
 	        /*
 	         * Generate G1 by generating the reduction matrices R and P1 a permutation
@@ -128,51 +96,17 @@ public class Prover {
 	         
 //=================================================================================================	         
 	         // Generate G3, the permuted version of G2
-	         int[][] pre_G3 = new int[][];
-	         int[][] P3 = MatrixOps.perm_mat(n);
+	         int[][] pre_G3 = new int[matrixSize][matrixSize];
+	         int[][] P3 = MatrixOps.perm_mat(matrixSize);
 	         int[][] G3 = MatrixOps.permute(pre_G3, P3);
 	         
 //================================================================================================
-	         // Store G3 and P3
-	         File G3F = new File("/graph3.txt");
-	         try{
-	        	 if(!G3F.exists()){
-	        		 G3F.createNewFile();
-	        	 }
-	         catch(IOException e){
-	        	 e.printStackTrace();
-	         }
-	         
-	         PrintWriter pw = new PrintWriter(G3F.getName());
 	         String G3_string = MatrixOps.convertToString(G3);
-	         pw.println(G3_string);
-	         pw.close();
-	         
-	         //================== Same for Permutation 3
-	         File P3F = new File("/P3.txt");
-	         try{
-	        	 if(!P3F.exists()){
-	        		 P3F.createNewFile();
-	        	 }
-	         catch(IOException e){
-	        	 e.printStackTrace();
-	         }
-	         PrintWriter pw = new PrintWriter(P3F.getName());
+	         Communication.sendBuffer(socket, G3_string);
+	         //Permutation 3
 	         String P3_string = MatrixOps.convertToString(P3);
-	         pw.println(P3_string);
-	         pw.close();
-	         
-//==================================================================================================
-	         // Commit to G3
-	         File G3Commit = new File("/graphcommit.txt");
-	         try{
-	        	 if(!G3Commit.exists()){
-	        		 G3Commit.createNewFile();
-	        	 }
-	         catch(IOException e){
-	        	 e.printStackTrace();
-	         }
-	         HelperClass.graph_hash.hash_to_file(G3,"/graphcommit.txt");
+	         Communication.sendBuffer(socket,G3_string);
+	         GraphHash.hash_to_file(G3,"graphcommit.txt");
 //===================================================================================================	         
 	         //Commit to the permuted subgraph of G3 isomorphic to G1
 	         
@@ -198,9 +132,9 @@ public class Prover {
 	          * 
 	          */
 //==================================================================================================
-	         // I shouldn't mess with this part
+	         
 	         matrix = FileReader.readGraph("/g1");
-	         String buffer = convertToString(matrix);
+	         String buffer = MatrixOps.convertToString(matrix);
 	         String sendMessage = buffer + "\n";
 	         OutputStream os = socket.getOutputStream();
 	         OutputStreamWriter osw = new OutputStreamWriter(os);
@@ -237,7 +171,7 @@ public class Prover {
 	          //Closing the socket
 	          try{
 	                socket.close();
-	            }
+	          }
 	          catch(Exception e){
 	                e.printStackTrace();
 	          }
