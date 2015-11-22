@@ -1,7 +1,9 @@
+package HelperClass;
+
 import java.io.*;
 import java.util.Arrays;
 import java.util.Random;
-
+import java.util.ArrayList;
 public class MatrixOps {
 	
 	// Given graph, convert to String

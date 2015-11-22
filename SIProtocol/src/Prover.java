@@ -11,10 +11,9 @@
 
 import java.io.*;
 import java.net.Socket;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import HelperClass.*;
+import HelperClass.FileReader;
+import HelperClass.GraphHash;
+import HelperClass.MatrixOps;
 
 
 public class Prover {
@@ -50,7 +49,7 @@ public class Prover {
 	  * @param matrix
 	  * @return string
 	  */
-	 public static String convertToString(int[][] matrix){
+	 public static String convertToString(int[][] matrix) {
 		 String buffer = "";
 		 int length = matrix[0].length;
 		 for(int i = 0; i < length; i++){
@@ -59,19 +58,10 @@ public class Prover {
 		 }
 		 return buffer;
 	 }
-	 
-	 
-	 
+
 	 public static void main(String args[]){
 	     try {
-	         String host = "localhost";
-	         /* Get the server address from a dialog box.
-	            If prover and verifier are running on the 
-	            same iOS machine, leave IPAddress empty*/
-	         String serverAddress = JOptionPane.showInputDialog(
-	                    "Enter IP Address of a machine that is\n" +
-	                    "If it's running on iOS terminal, leave it empty");
-	         socket = new Socket(serverAddress, 6077);
+	         socket = new Socket("", 6077);
 	        /* JFrame f = new JFrame();
 	         JFileChooser fc = new JFileChooser();
 	         int ret = fc.showOpenDialog(f);
@@ -95,7 +85,7 @@ public class Prover {
 //============================================================================================	         
 	         // Generate G2
 	         int[][] pre_G2 = new int[n][n];
-	         int[][] G2 = matrixops.fill(pre_G2,0.7);
+	         int[][] G2 = MatrixOps.fill(pre_G2,0.7);
 	         
 //============================================================================================
 	         // Store G2
@@ -104,6 +94,7 @@ public class Prover {
 	        	 if(!G2F.exists()){
 	        		 G2F.createNewFile();
 	        	 }
+	         }
 	         catch(IOException e){
 	        	 e.printStackTrace();
 	         }
@@ -128,7 +119,7 @@ public class Prover {
 	         
 //=================================================================================================	         
 	         // Generate G3, the permuted version of G2
-	         int[][] pre_G3 = new int[][];
+	         int[][] pre_G3 = new int[n][n];
 	         int[][] P3 = MatrixOps.perm_mat(n);
 	         int[][] G3 = MatrixOps.permute(pre_G3, P3);
 	         
@@ -139,11 +130,12 @@ public class Prover {
 	        	 if(!G3F.exists()){
 	        		 G3F.createNewFile();
 	        	 }
+	         }
 	         catch(IOException e){
 	        	 e.printStackTrace();
 	         }
 	         
-	         PrintWriter pw = new PrintWriter(G3F.getName());
+	         PrintWriter pwn = new PrintWriter(G3F.getName());
 	         String G3_string = MatrixOps.convertToString(G3);
 	         pw.println(G3_string);
 	         pw.close();
@@ -154,10 +146,11 @@ public class Prover {
 	        	 if(!P3F.exists()){
 	        		 P3F.createNewFile();
 	        	 }
+	         }
 	         catch(IOException e){
 	        	 e.printStackTrace();
 	         }
-	         PrintWriter pw = new PrintWriter(P3F.getName());
+	         PrintWriter pwx = new PrintWriter(P3F.getName());
 	         String P3_string = MatrixOps.convertToString(P3);
 	         pw.println(P3_string);
 	         pw.close();
@@ -169,10 +162,11 @@ public class Prover {
 	        	 if(!G3Commit.exists()){
 	        		 G3Commit.createNewFile();
 	        	 }
+	         }
 	         catch(IOException e){
 	        	 e.printStackTrace();
 	         }
-	         HelperClass.graph_hash.hash_to_file(G3,"/graphcommit.txt");
+	         HelperClass.GraphHash.hash_to_file(G3,"/graphcommit.txt");
 //===================================================================================================	         
 	         //Commit to the permuted subgraph of G3 isomorphic to G1
 	         
@@ -198,7 +192,7 @@ public class Prover {
 	          * 
 	          */
 //==================================================================================================
-	         // I shouldn't mess with this part
+	         
 	         matrix = FileReader.readGraph("/g1");
 	         String buffer = convertToString(matrix);
 	         String sendMessage = buffer + "\n";
@@ -237,7 +231,7 @@ public class Prover {
 	          //Closing the socket
 	          try{
 	                socket.close();
-	            }
+	          }
 	          catch(Exception e){
 	                e.printStackTrace();
 	          }
