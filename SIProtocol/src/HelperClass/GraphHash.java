@@ -1,8 +1,9 @@
 package HelperClass;
 
-import java.io.*;
 import java.security.*;
+import java.io.IOException;
 import java.math.*;
+import HelperClass.FastFileWriter;
 
 public class GraphHash {
 	public static String convertToString(int[][] matrix){
@@ -43,15 +44,8 @@ public class GraphHash {
 	}
 	
 // If we want to hash the graph and save to file
-	public static void hash_to_file(int[][] G, String filename){
-		try{
+	public static void hash_to_file(int[][] G, String filename) throws IOException{
 		BigInteger H = hash(G);
-		PrintWriter pw = new PrintWriter(filename);
-		pw.println(new String(H.toByteArray()));
-		pw.close();
-		}
-		catch(Exception e){
-			e.printStackTrace();
-		}
+		FastFileWriter.WriteToANewFile(filename, ""+H);
 	}
 }

@@ -103,17 +103,7 @@ public class Prover {
 	         Communication.sendBuffer(socket,G3_string);
 	         
 //==================================================================================================
-	         // Commit to G3
-	         File G3Commit = new File("/graphcommit.txt");
-	         try{
-	        	 if(!G3Commit.exists()){
-	        		 G3Commit.createNewFile();
-	        	 }
-	         }
-	         catch(IOException e){
-	        	 e.printStackTrace();
-	         }
-	         GraphHash.hash_to_file(G3,"/graphcommit.txt");
+	         GraphHash.hash_to_file(G3,"graphcommit.txt");
 //===================================================================================================	         
 	         //Commit to the permuted subgraph of G3 isomorphic to G1
 	         
