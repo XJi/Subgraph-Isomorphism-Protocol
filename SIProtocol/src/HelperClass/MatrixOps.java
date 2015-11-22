@@ -168,8 +168,10 @@ public class MatrixOps {
     
     //==================================================
     // Generate removal matrix to remove rows/columns
-    public static int[][] generateRemovalMatrix(int n) {
-		
+    public static int[][] generateRemovalMatrix(int[][] A) {
+	
+	int n = A[0].length;
+	
 	// Generate array from 0 to n-1
 	ArrayList<Integer> range = new ArrayList<Integer>();
 
@@ -210,9 +212,7 @@ public class MatrixOps {
     }
     
     // Returns random subgraph of a given matrix A
-    public static int[][] subgraph(int[][] A) {
-    	
-    	int[][] removalMatrix = generateRemovalMatrix(A[0].length);
+    public static int[][] subgraph(int[][] A, int[][] removalMatrix) {
     	
     	int[][] subgraph = multiply(removalMatrix, A);
 	subgraph = multiply(subgraph, removalMatrix);
