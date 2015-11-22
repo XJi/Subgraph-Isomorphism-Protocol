@@ -4,7 +4,25 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.ArrayList;
 public class MatrixOps {
-	
+
+
+	/**
+	 * Compares two matrices and returns true if they are equal.
+	 */
+	 public static boolean compare(int[][] A, int[][] B) {
+		if((A[0].length != B[0].length) || A.length != B.length)
+			return false;
+
+		for(int i = 0; i < A.length; i++) {
+			for(int j = 0; j < A[0].length; j++) {
+				if(A[i][j] != B[i][j])
+					return false;
+			}
+		}
+
+		return true;
+	}
+	 
 	/**
 	 * Convert an adjacency matrix to string before sending
 	 * it to the verifier
