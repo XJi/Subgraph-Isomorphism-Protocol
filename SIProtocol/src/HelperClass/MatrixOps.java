@@ -218,6 +218,27 @@ public class MatrixOps {
     	
     }
     
+    public static String rand_string(int n){
+    	
+    	Random r = new Random();
+    	String s = "";
+    	for(int i =0; i < n; i++){
+    		int temp = r.nextInt(2);
+    		s += temp;
+    	}
+    	return s;
+    }
+    
+    public static String xor(String u, String l){
+		StringBuilder sb = new StringBuilder();
+		
+		for(int i = 0; i < u.length(); i++){
+			sb.append((u.charAt(i) ^ l.charAt(i)));
+		}
+		String result = sb.toString();
+		//System.out.println(result);
+		return result;
+	}
     //==================================================
     // Intake an adjacency matrix A and permutation matrix P and return a permuted Adjacency matrix
     public static int[][] permute(int[][] A,int[][] P){
