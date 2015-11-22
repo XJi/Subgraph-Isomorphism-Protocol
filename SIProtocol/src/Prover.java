@@ -8,7 +8,12 @@
  *      1: request pi and Q' such that Q' = pi(G1)
  *  3. 	Verify the data received from Prover
  */
-
+/* TODO: WILL CLEAN UP THIS MESS TOMORROW AFTERNOON; 
+ * DO NOT TOUCH THIS CODE ON MASTER BEFORE THE MEETING; 
+ * TRY TO CALL HELPER FUNCTIONS AS MUSH AS YOU CAN TO REDUCE
+ *     THE LENGTH OF THE CODE AND MAKE IT MORE READABLE, BECAUSE WE ARE LAZY :P;
+ * I'M GONNA GO TO SLEEP ZZZ...
+ */
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
@@ -101,8 +106,6 @@ public class Prover {
 	         //Permutation 3
 	         String P3_string = MatrixOps.convertToString(P3);
 	         Communication.sendBuffer(socket,G3_string);
-	         
-//==================================================================================================
 	         GraphHash.hash_to_file(G3,"graphcommit.txt");
 //===================================================================================================	         
 	         //Commit to the permuted subgraph of G3 isomorphic to G1
