@@ -43,22 +43,6 @@ public class Prover {
 	 static String subQ = "subgraph of Q"; //TODO
 	 
 	 
-	 /**
-	  * Convert an adjacency matrix to string before sending
-	  * it to the verifier
-	  * @param matrix
-	  * @return string
-	  */
-	 public static String convertToString(int[][] matrix) {
-		 String buffer = "";
-		 int length = matrix[0].length;
-		 for(int i = 0; i < length; i++){
-			 for(int j = 0; j < length; j++)
-				 buffer += matrix[i][j];
-		 }
-		 return buffer;
-	 }
-
 	 public static void main(String args[]){
 	     try {
 	         socket = new Socket("", 6077);
@@ -194,7 +178,7 @@ public class Prover {
 //==================================================================================================
 	         
 	         matrix = FileReader.readGraph("/g1");
-	         String buffer = convertToString(matrix);
+	         String buffer = MatrixOps.convertToString(matrix);
 	         String sendMessage = buffer + "\n";
 	         OutputStream os = socket.getOutputStream();
 	         OutputStreamWriter osw = new OutputStreamWriter(os);

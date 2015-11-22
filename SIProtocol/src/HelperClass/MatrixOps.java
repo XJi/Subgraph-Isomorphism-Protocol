@@ -1,12 +1,17 @@
 package HelperClass;
 
-import java.io.*;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.ArrayList;
 public class MatrixOps {
 	
-	// Given graph, convert to String
+	/**
+	 * Convert an adjacency matrix to string before sending
+	 * it to the verifier
+	 * @param matrix
+	 * @return string
+	 */
+	
 	public static String convertToString(int[][] matrix){
 		String buffer = "";
 		int length = matrix[0].length;
@@ -17,7 +22,11 @@ public class MatrixOps {
 		return buffer;
 	}
 		
-	// Given a string matrix like from a file, convert to matrix
+	/**
+	 * Convert the received buffer to an adjacency matrix
+	 * @param buffer
+	 * @return 2D adjacency matrix
+	 */
 	public static int[][] convertToMatrix(String buffer){	
 		int size = (int)Math.sqrt(buffer.length());
 		int[][] adjMatrix = new int[size][size];
@@ -28,7 +37,11 @@ public class MatrixOps {
 		return adjMatrix;
 	}
 		
-		
+	/**
+	 * Check if the given matrix is empty	
+	 * @param int [][] A
+	 * @return T: empty;  F:not empty
+	 */
 	
 	public static boolean isEmpty(int[][] A){
 		int c = 0;

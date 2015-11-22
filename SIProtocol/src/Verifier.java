@@ -1,7 +1,7 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Date;
+import HelperClass.MatrixOps;
 
 /**
  * In Subgraph Isomorphism Protocol, verifier runs Server 
@@ -37,23 +37,6 @@ public class Verifier {
 		return null;
 	}
 	
-	
-	/**
-	 * Convert the received buffer to an adjacency matrix
-	 * @param buffer
-	 * @return 2D adjacency matrix
-	 */
-	public static int[][] convertToMatrix(String buffer){	
-		int size = (int)Math.sqrt(buffer.length());
-		int[][] adjMatrix = new int[size][size];
-		for(int i = 0; i < size; i++){
-			for(int j = 0; j < size; j++)
-				adjMatrix[i][j] = (int)buffer.charAt(i*size+j);
-		}
-		return adjMatrix;
-	}
-	
-	
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = new ServerSocket(SERVERPORT);
         try {
@@ -64,7 +47,7 @@ public class Verifier {
             	/* Receive commitment(Q) */
                 String s = receiveBuffer(socket);
                 // Get commitment Q from the prover
-                int[][] commitmentQ = convertToMatrix(s);
+                int[][] commitmentQ = MatrixOps.convertToMatrix(s);
                 int bit = (int)(Math.random()+0.5);
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                 out.println(bit+"\n");
