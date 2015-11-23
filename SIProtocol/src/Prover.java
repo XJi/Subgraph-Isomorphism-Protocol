@@ -16,33 +16,29 @@ import HelperClass.Communication;
 import HelperClass.FileReader;
 import HelperClass.GraphHash;
 import HelperClass.MatrixOps;
+import HelperClass.commitOps;
 import HelperClass.FastFileWriter;
 
 
 public class Prover {
 	 private static Socket socket;
 	 static int[][] matrix;
+	 static int[][] G2;
+	 
 	 public static void main(String args[]){
 	     try {
 	         socket = new Socket("", 6077);
-	        /* JFrame f = new JFrame();
-	         JFileChooser fc = new JFileChooser();
-	         int ret = fc.showOpenDialog(f);
-			 if(ret==JFileChooser.APPROVE_OPTION){
-				 File file = fc.getSelectedFile();
-				 String name = file.getName();
-				 System.out.println(name);
-				 matrix = FileReader.readGraph(name);
-				 f.setVisible(true);
-				 
-			 }*/
 	         
 	         //Intake size n from user
 	         Scanner in = new Scanner(System.in);
 	         System.out.println("Enter the size of the adjacency matrix or enter 0 for reading given files\n");
 	         int matrixSize =Integer.parseInt(in.nextLine());
 	         // Generate G2
-	         int[][] G2 = MatrixOps.fill(new int[matrixSize][matrixSize],0.7);
+	         
+	         if (matrixSize == 0) {  // read from file
+	        	 String file_G2 = "/g2";
+	        	 G2 = FileReader.readGraph(file_G2);
+	         } else G2 = MatrixOps.fill(new int[matrixSize][matrixSize],0.7);
 
 	        /*
 	         * Generate G1 by generating the reduction matrices R and P1 a permutation
@@ -63,61 +59,53 @@ public class Prover {
 	         String G2_string = MatrixOps.convertToString(G2);
 	         FastFileWriter.WriteToFormattedFile("G2_graph.txt", G2_string);  
 	         Communication.sendBuffer(socket,G2_string);	         
-       
-	         // Generate G3, the permuted version of G2
-
-	         int[][] P3 = MatrixOps.perm_mat(matrixSize);
-	         int[][] G3 = MatrixOps.permute(G2,P3);
+	         int Number_run = 0; 
 	         
-//================================================================================================
-	         
-	         
-	         /*  I THINK THIS ALL NEEDS TO BE REMOVED, WE ONLY SEND G1, G2, COMMIT OF G3
-	          * 
-	          * We don't actually commit to P3, as this is redundant
-	          * 
-	          *
-	         String G3_string = MatrixOps.convertToString(G3);
-	         Communication.sendBuffer(socket, G3_string);
-	         //Permutation 3
-	         
-	         //** shouldn't this be changed to P3_string??
-	         String P3_string = MatrixOps.convertToString(P3);
-	         Communication.sendBuffer(socket,P3_string);
-	         
-	         //** Removed this and will replace 
-	         //GraphHash.hash_to_file(G3,"graphcommit.txt");
-
-	         */
-	         /*
-	         // NEW COMMIT -- just commit to G3
-	         String commitString = commitOps.commitGraph(G3);
-	         Communication.sendBuffer(socket,CommitString);
-	         */
-//==================================================================================================
-	         //Receive the challenge
-	         String bitStr = Communication.receiveBuffer(socket); 
-	         
-	         /*
-	          * If the challenge = 0, then we will send the files containing G3, P3
-	          */
-	         int bit = Integer.parseInt(bitStr);
-	         if(bit == 0){
-	        	 /* --Send G3 and P3 --*/
-	        	 Communication.sendBuffer(socket,MatrixOps.convertToString(G3));
-	        	 Communication.receiveBuffer(socket);
-	        	 Communication.sendBuffer(socket, MatrixOps.convertToString(P3));
+	         while (Number_run < 100) {
+	        	 Number_run ++;
 	        	 
-	         }
-	         else{
-	        	  /* Send Qprime, A */
-	        	 int[][] A = MatrixOps.multiply(P3,MatrixOps.transpose(P1));
-	        	 /* -- Compute Qprime -- */
-	        	 int[][] Qprime = MatrixOps.permute(G1, A);
-	        	 /* -- Send Qprime, A --*/
-	        	 Communication.sendBuffer(socket, MatrixOps.convertToString(A));
-	        	 Communication.receiveBuffer(socket);
-	        	 Communication.sendBuffer(socket,MatrixOps.convertToString(Qprime)); 
+		         // Generate G3, the permuted version of G2
+		         int[][] P3 = MatrixOps.perm_mat(matrixSize);
+		         int[][] G3 = MatrixOps.permute(G2,P3);
+		         
+		         // Send commitment
+		         String commitString = commitOps.graphCommit(G3);
+		         Communication.sendBuffer(socket,commitString);
+		         
+		         //Receive the challenge
+		         String bitStr = Communication.receiveBuffer(socket); 
+		         
+		         int bit = Integer.parseInt(bitStr);
+		         if(bit == 0){
+		        	 /* --Send G3 and P3 --*/
+		        	 Communication.sendBuffer(socket,MatrixOps.convertToString(G3));
+		        	 Communication.receiveBuffer(socket);
+		        	 Communication.sendBuffer(socket, MatrixOps.convertToString(P3));
+		        	 Communication.receiveBuffer(socket);
+		        	 
+		        	 String pass = Communication.receiveBuffer(socket);
+		        	 if (pass.equals("-1")) {
+		        		 System.out.println("Failed in " + Number_run + ".");
+		        		 break;
+		        	 }
+		         }
+		         else{
+		        	  /* Send Qprime, Pi */
+		        	 int[][] Pi = MatrixOps.multiply(P3,MatrixOps.transpose(P1));
+		        	 /* -- Compute Qprime -- */
+		        	 int[][] Qprime = MatrixOps.permute(G1, Pi);
+		        	 /* -- Send Qprime, Pi --*/
+		        	 Communication.sendBuffer(socket, MatrixOps.convertToString(Pi));
+		        	 Communication.receiveBuffer(socket);
+		        	 Communication.sendBuffer(socket,MatrixOps.convertToString(Qprime)); 
+		        	 Communication.receiveBuffer(socket);
+		        	 
+		        	 String pass = Communication.receiveBuffer(socket);
+		        	 if (pass.equals("-1")) {
+		        		 System.out.println("Failed in " + Number_run + ".");
+		        		 break;
+		        	 }
+		         }
 	         }
 	     }
 	      catch (Exception exception){
