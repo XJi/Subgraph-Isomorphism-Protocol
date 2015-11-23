@@ -1,13 +1,10 @@
 import java.io.*;
-import java.math.BigInteger;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 import HelperClass.Communication;
 import HelperClass.MatrixOps;
 import HelperClass.commitOps;
-import HelperClass.graph_hash;
-import HelperClass.FileReader;
 
 /**
  * In Subgraph Isomorphism Protocol, verifier runs Server 
@@ -34,8 +31,8 @@ public class Verifier {
         Communication.sendBuffer(socket, "1");
         String g2_string = Communication.receiveBuffer(socket);
         Communication.sendBuffer(socket, "1");
-        int[][] g1 = MatrixOps.convertToMatrix(g1_string);
-        int[][] g2 = MatrixOps.convertToMatrix(g2_string);
+        g1 = MatrixOps.convertToMatrix(g1_string);
+        g2 = MatrixOps.convertToMatrix(g2_string);
         		
         Number_run = 0;
         try {
