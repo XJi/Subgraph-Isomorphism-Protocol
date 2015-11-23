@@ -21,7 +21,6 @@ public class Communication {
 	        InputStreamReader isr = new InputStreamReader(is);
 	        BufferedReader br = new BufferedReader(isr);
 	        String buffer = br.readLine();
-	        System.out.println("Message received from prover is : "+ buffer);
 	        return buffer;
 		}
 		catch (Exception e){
@@ -42,7 +41,6 @@ public class Communication {
 		try{
 			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             out.println(msg +"\n");
-	        System.out.println("Message sent to prover is : "+ msg);
 		}
 		catch (Exception e){
 			e.printStackTrace();
