@@ -1,12 +1,10 @@
 import java.io.*;
-import java.math.BigInteger;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 import HelperClass.Communication;
 import HelperClass.MatrixOps;
-import HelperClass.graph_hash;
-import HelperClass.FileReader;
+import HelperClass.commitOps;
 
 /**
  * In Subgraph Isomorphism Protocol, verifier runs Server 
@@ -22,7 +20,6 @@ public class Verifier {
 	private static int SERVERPORT = 6077;
 	private static int[][] g1;
 	private static int[][] g2;
-	private static int[][] Q;
 	private static boolean fail;
 	private static int Number_run;
 	
@@ -30,13 +27,19 @@ public class Verifier {
 	
     public static void main(String[] args) throws Exception {
         ServerSocket serverSocket = new ServerSocket(SERVERPORT);
-        g1 = FileReader.readGraph("/g1");
-        g2 = FileReader.readGraph("/g2");
+        socket = serverSocket.accept();
+        String g1_string = Communication.receiveBuffer(socket);
+        Communication.sendBuffer(socket, "1");
+        String g2_string = Communication.receiveBuffer(socket);
+        Communication.sendBuffer(socket, "1");
+        g1 = MatrixOps.convertToMatrix(g1_string);
+        g2 = MatrixOps.convertToMatrix(g2_string);
+        		
         Number_run = 0;
         try {
-            while (Number_run < 100) {
+            while (Number_run < 5) {
             	Number_run ++;
-            	socket = serverSocket.accept();
+            	
             	System.out.println("Run " + Number_run + "\nAccept.\n"
             			+ "Request the commitment of Q");
             	
@@ -46,29 +49,51 @@ public class Verifier {
                 /*Send a random bit to prover and wait for prover's reply*/
                 int bit = (int)(Math.random()+0.5);
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                out.println(bit+"\n");
-                
-                String verify = Communication.receiveBuffer(socket);
+                out.println(bit);
+              
                 
                 if (bit == 0) {
-                	int[][] permutation = MatrixOps.convertToMatrix(verify);
-                	int[][] temp = MatrixOps.multiply(permutation, g2);
-                	Q = MatrixOps.multiply(temp, MatrixOps.transpose(permutation));
-                	BigInteger h = graph_hash.hash(Q);
-                	if (!Commitment_q.equals(h+"")) {
+                	String msg1 = Communication.receiveBuffer(socket);	// G3
+                	Communication.sendBuffer(socket, "1");
+                	String msg2 = Communication.receiveBuffer(socket);  // P3
+                	Communication.sendBuffer(socket, "1");
+                	int[][] G3 = MatrixOps.convertToMatrix(msg1);
+                	int[][] P3 = MatrixOps.convertToMatrix(msg2);
+                	boolean didCommit = commitOps.checkCommit(Commitment_q,G3);
+                	if (!didCommit) {
+                		Communication.sendBuffer(socket, "-1");  
                 		fail = true;
                 		break;
                 	}
-                } else {
-                	int[][] pi = MatrixOps.convertToMatrix(verify);
-                	String s = Communication.receiveBuffer(socket);
-                	int[][] Q_prime = MatrixOps.convertToMatrix(s);
-                	int[][] temp = MatrixOps.multiply(pi, g1);
-                	int[][] Q_prime_generated = MatrixOps.multiply(temp, MatrixOps.transpose(pi));
-                	if (!MatrixOps.compare(Q_prime_generated, Q_prime)) {
+                	int[][] Q = MatrixOps.permute(g2,P3);
+                	boolean pass = commitOps.areEqual(Q,G3);
+                	if (!pass) {
+                		Communication.sendBuffer(socket, "-1");  
                 		fail = true;
                 		break;
-                	}	
+                	}
+                	
+                } else {
+                	String msg1 = Communication.receiveBuffer(socket);	//Qprime
+                	Communication.sendBuffer(socket, "1");
+                	String msg2 = Communication.receiveBuffer(socket);  //Pi
+                	Communication.sendBuffer(socket, "1");
+                	int[][] Qprime = MatrixOps.convertToMatrix(msg1);
+                	int[][] Pi = MatrixOps.convertToMatrix(msg2);
+                	boolean didCommit = commitOps.checkCommit(Commitment_q, Qprime);
+                	if (!didCommit) {
+                		Communication.sendBuffer(socket, "-1");  
+                		fail = true;
+                		break;
+                	}
+                	int[][] Qcheck = MatrixOps.permute(g1, Pi);
+                	boolean pass = commitOps.areEqual(Qcheck,Qprime);
+                	if (!pass) {
+                		Communication.sendBuffer(socket, "-1");  
+                		fail = true;
+                		break;
+                	}
+                	
                 }
             }
             if(fail) {
