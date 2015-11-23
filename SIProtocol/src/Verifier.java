@@ -5,6 +5,7 @@ import java.net.Socket;
 
 import HelperClass.Communication;
 import HelperClass.MatrixOps;
+import HelperClass.commitOps;
 import HelperClass.graph_hash;
 import HelperClass.FileReader;
 
@@ -30,8 +31,13 @@ public class Verifier {
 	
     public static void main(String[] args) throws Exception {
         ServerSocket serverSocket = new ServerSocket(SERVERPORT);
-        g1 = FileReader.readGraph("/g1");
-        g2 = FileReader.readGraph("/g2");
+        String g1_string = Communication.receiveBuffer(socket);
+        Communication.sendBuffer(socket, "1");
+        String g2_string = Communication.receiveBuffer(socket);
+        Communication.sendBuffer(socket, "1");
+        int[][] g1 = MatrixOps.convertToMatrix(g1_string);
+        int[][] g2 = MatrixOps.convertToMatrix(g2_string);
+        		
         Number_run = 0;
         try {
             while (Number_run < 100) {
@@ -47,10 +53,29 @@ public class Verifier {
                 int bit = (int)(Math.random()+0.5);
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                 out.println(bit+"\n");
-                
-                String verify = Communication.receiveBuffer(socket);
+              
                 
                 if (bit == 0) {
+                	String msg1 = Communication.receiveBuffer(socket);	// G3
+                	Communication.sendBuffer(socket, "1");
+                	String msg2 = Communication.receiveBuffer(socket);  // P3
+                	Communication.sendBuffer(socket, "1");
+                	int[][] G3 = MatrixOps.convertToMatrix(msg1);
+                	int[][] P3 = MatrixOps.convertToMatrix(msg2);
+                	boolean didCommit = commitOps.checkCommit(Commitment_q,G3);
+                	if (!didCommit) {
+                		Communication.sendBuffer(socket, "-1");  
+                		fail = true;
+                		break;
+                	}
+                	int[][] Q = MatrixOps.permute(g2,P3);
+                	boolean pass = commitOps.areEqual(Q,G3);
+                	if (!pass) {
+                		Communication.sendBuffer(socket, "-1");  
+                		fail = true;
+                		break;
+                	}
+                	
                 	/*
                 	 * With the new implementation the verifier will recieve:
                 	 * G3, P3
@@ -76,15 +101,25 @@ public class Verifier {
                 	 *  
                 	 *  
                 	 */
-                	int[][] permutation = MatrixOps.convertToMatrix(verify);
-                	int[][] temp = MatrixOps.multiply(permutation, g2);
-                	Q = MatrixOps.multiply(temp, MatrixOps.transpose(permutation));
-                	BigInteger h = graph_hash.hash(Q);
-                	if (!Commitment_q.equals(h+"")) {
+                } else {
+                	String msg1 = Communication.receiveBuffer(socket);	// G3
+                	String msg2 = Communication.receiveBuffer(socket);  // P3
+                	int[][] Qprime = MatrixOps.convertToMatrix(msg1);
+                	int[][] Pi = MatrixOps.convertToMatrix(msg2);
+                	boolean didCommit = commitOps.checkCommit(Commitment_q, Qprime);
+                	if (!didCommit) {
+                		Communication.sendBuffer(socket, "-1");  
                 		fail = true;
                 		break;
                 	}
-                } else {
+                	int[][] Qcheck = MatrixOps.permute(g1, Pi);
+                	boolean pass = commitOps.areEqual(Qcheck,Qprime);
+                	if (!pass) {
+                		Communication.sendBuffer(socket, "-1");  
+                		fail = true;
+                		break;
+                	}
+                	
                 	/*
                 	 * Here is where we recieve the 
                 	 * Qprime, A
@@ -105,15 +140,6 @@ public class Verifier {
                 	 *
                 	 * 
                 	 */
-                	int[][] pi = MatrixOps.convertToMatrix(verify);
-                	String s = Communication.receiveBuffer(socket);
-                	int[][] Q_prime = MatrixOps.convertToMatrix(s);
-                	int[][] temp = MatrixOps.multiply(pi, g1);
-                	int[][] Q_prime_generated = MatrixOps.multiply(temp, MatrixOps.transpose(pi));
-                	if (!MatrixOps.compare(Q_prime_generated, Q_prime)) {
-                		fail = true;
-                		break;
-                	}	
                 }
             }
             if(fail) {
