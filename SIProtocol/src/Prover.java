@@ -37,54 +37,37 @@ public class Prover {
 				 
 			 }*/
 	         
-	         /* Taylor's additions on 11/19 Here I will add in the functionality to generate the matrices G2, G1, as well as the permutations necessary to convert between them
-	          *
-	          */
-//===========================================================================================
-	         
 	         //Intake size n from user
 	         Scanner in = new Scanner(System.in);
 	         System.out.println("Enter the size of the adjacency matrix or enter 0 for reading given files\n");
 	         int matrixSize =Integer.parseInt(in.nextLine());
-//============================================================================================	         
 	         // Generate G2
 	         int[][] G2 = MatrixOps.fill(new int[matrixSize][matrixSize],0.7);
-	         String G2_string = MatrixOps.convertToString(G2);
-	         FastFileWriter.WriteToANewFile("G2.txt", G2_string);   //Ugly, will fix later
 
-//===============================================================================================
 	        /*
 	         * Generate G1 by generating the reduction matrices R and P1 a permutation
 	         * Currently we do not need to store these as we will not ever send them directly
-	         * 
-	         * int[][] R = MatrixOps.generateRemovalMatrix(matrixSize);
-	         * int[][] P1 = MatrixOps.perm_mat(matrixSize);
-	         * int[][] G1 = MatrixOps.multiply(R,G2);
-	         * G1 = MatrixOps.mutliply(G1,R);
-	         * G1 = MatrixOps.permute(G1,P1);
-	         * 
-	         * -- Store G1 -- 
-	         * 
-	         * 
-	         * -- SEND G1, G2 TO VERIFIER -- 
-	         * 
-	         * 
 	         */
-	         int[][] G1 =  MatrixOps.generateRemovalMatrix(G2);
+	         int[][] R = MatrixOps.generateRemovalMatrix(new int[matrixSize][matrixSize]);
+	         int[][] P1 = MatrixOps.perm_mat(matrixSize);
+	         int[][] G1 = MatrixOps.multiply(R,G2);
+	         G1 = MatrixOps.multiply(G1,R);
+	         G1 = MatrixOps.permute(G1,P1);
+	          
+	         /* -- SEND G1, G2 TO VERIFIER -- */
+	         
 	         String G1_string = MatrixOps.convertToString(G1);
-	         FastFileWriter.WriteToANewFile("G1.txt", G1_string);  //Ugly, will fix later
+	         FastFileWriter.WriteToFormattedFile("G1_subgraphOfG2.txt", G1_string); 
 	         Communication.sendBuffer(socket,G1_string);
-	         
-//=================================================================================================	         
+	         Communication.receiveBuffer(socket);   //In case any package gets lost during transportation
+	         String G2_string = MatrixOps.convertToString(G2);
+	         FastFileWriter.WriteToFormattedFile("G2_graph.txt", G2_string);  
+	         Communication.sendBuffer(socket,G2_string);	         
+       
 	         // Generate G3, the permuted version of G2
-	         /*
-	          *
-	          */
+
 	         int[][] P3 = MatrixOps.perm_mat(matrixSize);
-	         
-	         // note this needs to be changed to 
-	         // int[][] G3 = MatrixOps.permute(G2,P3);
-	         int[][] G3 = MatrixOps.permute(G2, P3);
+	         int[][] G3 = MatrixOps.permute(G2,P3);
 	         
 //================================================================================================
 	         
@@ -120,39 +103,21 @@ public class Prover {
 	          */
 	         int bit = Integer.parseInt(bitStr);
 	         if(bit == 0){
-	        	 /*
-	        	  * This is when we send G3, P3
-	        	  * 
-	        	  * -- Send G3--
-	        	  * -- Send P3--
-	        	  * 
-	        	  */
+	        	 /* --Send G3 and P3 --*/
+	        	 Communication.sendBuffer(socket,MatrixOps.convertToString(G3));
+	        	 Communication.receiveBuffer(socket);
+	        	 Communication.sendBuffer(socket, MatrixOps.convertToString(P3));
 	        	 
-	        	 // Sending P3^-1
-	        	 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-	             out.println(MatrixOps.transpose(G3));
-	             out.println();	
 	         }
 	         else{
-	        	 /*
-	        	  * Send Qprime, A
-	        	  * 
-	        	  * -- Compute A --
-	        	  * int[][] P1t = MatrixOps.transpose(P1); 
-	        	  * int[][] A = MatrixOps.multiply(P3,P1t);
-	        	  * 
-	        	  * 
-	        	  * -- Compute Qprime -- 
-	        	  * 
-	        	  * int[][] Qprime = MatrixOps.permute(G1, A);
-	        	  *
-	        	  * -- Send Qprime, A --
-	        	  * 
-	        	  */
-	        	
-	        	 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-	             out.println(MatrixOps.transpose(P3));
-	             out.println(G1);
+	        	  /* Send Qprime, A */
+	        	 int[][] A = MatrixOps.multiply(P3,MatrixOps.transpose(P1));
+	        	 /* -- Compute Qprime -- */
+	        	 int[][] Qprime = MatrixOps.permute(G1, A);
+	        	 /* -- Send Qprime, A --*/
+	        	 Communication.sendBuffer(socket, MatrixOps.convertToString(A));
+	        	 Communication.receiveBuffer(socket);
+	        	 Communication.sendBuffer(socket,MatrixOps.convertToString(Qprime)); 
 	         }
 	     }
 	      catch (Exception exception){
