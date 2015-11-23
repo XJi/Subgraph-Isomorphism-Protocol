@@ -27,6 +27,7 @@ public class Verifier {
 	
     public static void main(String[] args) throws Exception {
         ServerSocket serverSocket = new ServerSocket(SERVERPORT);
+        socket = serverSocket.accept();
         String g1_string = Communication.receiveBuffer(socket);
         Communication.sendBuffer(socket, "1");
         String g2_string = Communication.receiveBuffer(socket);
@@ -38,7 +39,7 @@ public class Verifier {
         try {
             while (Number_run < 100) {
             	Number_run ++;
-            	socket = serverSocket.accept();
+            	
             	System.out.println("Run " + Number_run + "\nAccept.\n"
             			+ "Request the commitment of Q");
             	
