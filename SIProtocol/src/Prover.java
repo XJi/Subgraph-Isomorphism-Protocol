@@ -57,7 +57,18 @@ public class Prover {
 	         * Generate G1 by generating the reduction matrices R and P1 a permutation
 	         * Currently we do not need to store these as we will not ever send them directly
 	         * 
-	         * Naturally however we store P1
+	         * int[][] R = MatrixOps.generateRemovalMatrix(matrixSize);
+	         * int[][] P1 = MatrixOps.perm_mat(matrixSize);
+	         * int[][] G1 = MatrixOps.multiply(R,G2);
+	         * G1 = MatrixOps.mutliply(G1,R);
+	         * G1 = MatrixOps.permute(G1,P1);
+	         * 
+	         * -- Store G1 -- 
+	         * 
+	         * 
+	         * -- SEND G1, G2 TO VERIFIER -- 
+	         * 
+	         * 
 	         */
 	         int[][] G1 =  MatrixOps.generateRemovalMatrix(G2);
 	         String G1_string = MatrixOps.convertToString(G1);
@@ -66,27 +77,40 @@ public class Prover {
 	         
 //=================================================================================================	         
 	         // Generate G3, the permuted version of G2
+	         /*
+	          *
+	          */
 	         int[][] P3 = MatrixOps.perm_mat(matrixSize);
-	         int[][] G3 = MatrixOps.permute(new int[matrixSize][matrixSize], P3);
+	         
+	         // note this needs to be changed to 
+	         // int[][] G3 = MatrixOps.permute(G2,P3);
+	         int[][] G3 = MatrixOps.permute(G2, P3);
 	         
 //================================================================================================
+	         
+	         
+	         /*  I THINK THIS ALL NEEDS TO BE REMOVED, WE ONLY SEND G1, G2, COMMIT OF G3
+	          * 
+	          * We don't actually commit to P3, as this is redundant
+	          * 
+	          *
 	         String G3_string = MatrixOps.convertToString(G3);
 	         Communication.sendBuffer(socket, G3_string);
 	         //Permutation 3
+	         
+	         //** shouldn't this be changed to P3_string??
 	         String P3_string = MatrixOps.convertToString(P3);
-	         Communication.sendBuffer(socket,G3_string);
-	         GraphHash.hash_to_file(G3,"graphcommit.txt");
-//===================================================================================================	         
-	         //Commit to the permuted subgraph of G3 isomorphic to G1
+	         Communication.sendBuffer(socket,P3_string);
 	         
-	         
-	         /* Repeat the above essentially but do subgraph commit
-	          * 
-	          */
-//==================================================================================================
-	         // Send commits of G3, subgraph
-	         
-	         
+	         //** Removed this and will replace 
+	         //GraphHash.hash_to_file(G3,"graphcommit.txt");
+
+	         */
+	         /*
+	         // NEW COMMIT -- just commit to G3
+	         String commitString = commitOps.commitGraph(G3);
+	         Communication.sendBuffer(socket,CommitString);
+	         */
 //==================================================================================================
 	         //Receive the challenge
 	         String bitStr = Communication.receiveBuffer(socket); 
@@ -96,13 +120,36 @@ public class Prover {
 	          */
 	         int bit = Integer.parseInt(bitStr);
 	         if(bit == 0){
+	        	 /*
+	        	  * This is when we send G3, P3
+	        	  * 
+	        	  * -- Send G3--
+	        	  * -- Send P3--
+	        	  * 
+	        	  */
+	        	 
 	        	 // Sending P3^-1
 	        	 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 	             out.println(MatrixOps.transpose(G3));
 	             out.println();	
 	         }
 	         else{
-	        	 // Sending P3^-1 P1
+	        	 /*
+	        	  * Send Qprime, A
+	        	  * 
+	        	  * -- Compute A --
+	        	  * int[][] P1t = MatrixOps.transpose(P1); 
+	        	  * int[][] A = MatrixOps.multiply(P3,P1t);
+	        	  * 
+	        	  * 
+	        	  * -- Compute Qprime -- 
+	        	  * 
+	        	  * int[][] Qprime = MatrixOps.permute(G1, A);
+	        	  *
+	        	  * -- Send Qprime, A --
+	        	  * 
+	        	  */
+	        	
 	        	 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 	             out.println(MatrixOps.transpose(P3));
 	             out.println(G1);
