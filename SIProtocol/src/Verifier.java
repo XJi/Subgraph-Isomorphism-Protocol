@@ -23,7 +23,6 @@ public class Verifier {
 	private static int SERVERPORT = 6077;
 	private static int[][] g1;
 	private static int[][] g2;
-	private static int[][] Q;
 	private static boolean fail;
 	private static int Number_run;
 	
@@ -102,8 +101,8 @@ public class Verifier {
                 	 *  
                 	 */
                 } else {
-                	String msg1 = Communication.receiveBuffer(socket);	// G3
-                	String msg2 = Communication.receiveBuffer(socket);  // P3
+                	String msg1 = Communication.receiveBuffer(socket);	//Qprime
+                	String msg2 = Communication.receiveBuffer(socket);  //Pi
                 	int[][] Qprime = MatrixOps.convertToMatrix(msg1);
                 	int[][] Pi = MatrixOps.convertToMatrix(msg2);
                 	boolean didCommit = commitOps.checkCommit(Commitment_q, Qprime);
