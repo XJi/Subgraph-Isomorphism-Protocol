@@ -75,34 +75,11 @@ public class Verifier {
                 		break;
                 	}
                 	
-                	/*
-                	 * With the new implementation the verifier will recieve:
-                	 * G3, P3
-                	 * 
-                	 * Then they will convert these two different things to strings
-                	 * int[][] G3 = ----;
-                	 * int[][] P3 = ----;
-                	 * 
-                	 * -- check that G3 given matches the commitment --
-                	 * boolean didCommit = commitOps.checkCommit(Commitment_q,G3);
-                	 * if(!didCommit){
-                	 *  	break protocol 
-                	 *  	}
-                	 *  
-                	 *  -- now check G2 ~= G3--
-                	 *  int[][] Q = MatrixOps.permute(G2,P3);
-                	 *  
-                	 *  
-                	 *  boolean pass = commitOps.areEqual(Q,G3);
-                	 *  if(pass){ *print* "pass"}
-                	 *  
-                	 *  that pass above is essentialy the final pass.
-                	 *  
-                	 *  
-                	 */
                 } else {
                 	String msg1 = Communication.receiveBuffer(socket);	//Qprime
+                	Communication.sendBuffer(socket, "1");
                 	String msg2 = Communication.receiveBuffer(socket);  //Pi
+                	Communication.sendBuffer(socket, "1");
                 	int[][] Qprime = MatrixOps.convertToMatrix(msg1);
                 	int[][] Pi = MatrixOps.convertToMatrix(msg2);
                 	boolean didCommit = commitOps.checkCommit(Commitment_q, Qprime);
@@ -119,26 +96,6 @@ public class Verifier {
                 		break;
                 	}
                 	
-                	/*
-                	 * Here is where we recieve the 
-                	 * Qprime, A
-                	 * 
-                	 * int[][] Qprime = -----;
-                	 * int[][] A = -------;
-                	 * 
-                	 * 
-                	 * --this part checks the commitment matches--
-                	 * 
-                	 * boolean didCommit = commitOps.checkCommit(Commitment_q, Qprime);
-                	 * if(!didCommit){ break protocol}
-                	 * 
-                	 * int[][] Qcheck = MatrixOps.permute(G1,A)
-                	 * 
-                	 * boolean pass = commitOps.areEqual(Qcheck,Qprime);
-                	 *if(pass){ print "pass"}
-                	 *
-                	 * 
-                	 */
                 }
             }
             if(fail) {
