@@ -1,5 +1,5 @@
-package hashtest;
-import java.io.*;
+package HelperClass;
+
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.ArrayList;
