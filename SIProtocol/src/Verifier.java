@@ -37,7 +37,7 @@ public class Verifier {
         		
         Number_run = 0;
         try {
-            while (Number_run < 100) {
+            while (Number_run < 5) {
             	Number_run ++;
             	
             	System.out.println("Run " + Number_run + "\nAccept.\n"
@@ -49,7 +49,7 @@ public class Verifier {
                 /*Send a random bit to prover and wait for prover's reply*/
                 int bit = (int)(Math.random()+0.5);
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                out.println(bit+"\n");
+                out.println(bit);
               
                 
                 if (bit == 0) {

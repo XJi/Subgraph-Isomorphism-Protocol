@@ -61,7 +61,7 @@ public class Prover {
 	         Communication.sendBuffer(socket,G2_string);	         
 	         int Number_run = 0; 
 	         
-	         while (Number_run < 100) {
+	         while (Number_run < 5) {
 	        	 Number_run ++;
 	        	 
 		         // Generate G3, the permuted version of G2
@@ -71,16 +71,21 @@ public class Prover {
 		         // Send commitment
 		         String commitString = commitOps.graphCommit(G3);
 		         Communication.sendBuffer(socket,commitString);
+		         System.out.println("Sent to verifier: Commitment of G3 " + commitString);
 		         
 		         //Receive the challenge
 		         String bitStr = Communication.receiveBuffer(socket); 
-		         
 		         int bit = Integer.parseInt(bitStr);
 		         if(bit == 0){
 		        	 /* --Send G3 and P3 --*/
-		        	 Communication.sendBuffer(socket,MatrixOps.convertToString(G3));
+		        	 String G3_string = MatrixOps.convertToString(G3);
+		        	 Communication.sendBuffer(socket,G3_string);
+		        	 System.out.println("Sent to verifier: G3 (in bit = 0) " + G3_string);
 		        	 Communication.receiveBuffer(socket);
+		        	 String P3_string = MatrixOps.convertToString(P3);
+		        	 Communication.sendBuffer(socket,P3_string);
 		        	 Communication.sendBuffer(socket, MatrixOps.convertToString(P3));
+		        	 System.out.println("Sent to verifier: G3 (in bit = 0) " + P3_string);
 		        	 Communication.receiveBuffer(socket);
 		        	 
 		        	 String pass = Communication.receiveBuffer(socket);
