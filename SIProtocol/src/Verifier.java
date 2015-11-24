@@ -29,7 +29,8 @@ public class Verifier {
         ServerSocket serverSocket = new ServerSocket(SERVERPORT);
         socket = serverSocket.accept();
         String g1_string = Communication.receiveBuffer(socket);
-        Communication.sendBuffer(socket, "1");
+       // Communication.sendBuffer(socket, "1");
+        Thread.sleep(50);
         String g2_string = Communication.receiveBuffer(socket);
         g1 = MatrixOps.convertToMatrix(g1_string);
         System.out.println("Printing G1 now");
@@ -39,7 +40,7 @@ public class Verifier {
         MatrixOps.matrix_print(g2);		
         Number_run = 0;
         try {
-            while (Number_run < 5) {
+            while (Number_run < 50) {
             	Number_run ++;
             	
             	System.out.println("Run " + Number_run + "\nAccept.\n"
@@ -49,20 +50,21 @@ public class Verifier {
                 String Commitment_q = Communication.receiveBuffer(socket);
                 System.out.println("The com_Q is:"+ Commitment_q+"aa");
                 /*Send a random bit to prover and wait for prover's reply*/
-                int bit = 1;//(int)(Math.random()+0.5);
+                int bit = (int)(Math.random()+0.5);
                 Communication.sendBuffer(socket, ""+bit);                
                 if (bit == 0) {
                 	String msg1 = Communication.receiveBuffer(socket);	// G3
-                	Communication.sendBuffer(socket, "1");
+                	//Communication.sendBuffer(socket, "1");
+                	Thread.sleep(50);
                 	String msg2 = Communication.receiveBuffer(socket);  // P3
-                	Communication.sendBuffer(socket, "1");
+                	//Communication.sendBuffer(socket, "1");
+                	Thread.sleep(50);
                 	int[][] G3 = MatrixOps.convertToMatrix(msg1);
                 	int[][] P3 = MatrixOps.convertToMatrix(msg2);
                 	
    		         	System.out.println("Printing G3");
    		         	MatrixOps.matrix_print(G3);
-   	        	 System.out.println("Printing P3");
-		         MatrixOps.matrix_print(P3);
+   	        	
 		            System.out.println("Printing hash of G3: "+commitOps.graphCommit(G3)+"aa");
                 	boolean didCommit = commitOps.checkCommit(Commitment_q,G3);
                 	if (!didCommit) {
@@ -84,19 +86,15 @@ public class Verifier {
                 } else {
                   	String msg2 = Communication.receiveBuffer(socket);  //Pi
                 	int[][] Pi = MatrixOps.convertToMatrix(msg2);
-                	Communication.sendBuffer(socket, "1");
+                	Thread.sleep(50);
                 	String msg1 = Communication.receiveBuffer(socket);	//Qprime
                 	int[][] Qprime = MatrixOps.convertToMatrix(msg1);
-                	Communication.sendBuffer(socket, "1");
+                	Thread.sleep(50);
                 	// receive Qprimeprime
                 	String msg3 = Communication.receiveBuffer(socket);	//Qprimeprime
                 	int[][] Qprimeprime = MatrixOps.convertToMatrix(msg3);
-                	Communication.sendBuffer(socket, "1");
-   		         	System.out.println("Printing QPrime");
-   		         	MatrixOps.matrix_print(Qprime);
-   	        	 System.out.println("Printing Pi");
-		         MatrixOps.matrix_print(Pi);
-		         //System.out.println("Printing hash of qprime");
+                	Thread.sleep(50);
+                	//Communication.sendBuffer(socket, "1");
 		         
                 	boolean didCommit = commitOps.checkCommit(Commitment_q, Qprimeprime);
                 	if (!didCommit) {

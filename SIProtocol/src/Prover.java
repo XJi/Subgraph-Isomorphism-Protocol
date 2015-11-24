@@ -37,12 +37,11 @@ public class Prover {
 	         int[][] G2;
 	         if (matrixSize == 0) {  // read from file
 	        	 System.out.println("Reading from the file");
-	        	 String file_G2 = "/g2";
+	        	 String file_G2 = "/g3";
 	        	 G2 = FileReader.readGraph(file_G2);
 	        	 System.out.println("Printing G2");
 	        	 MatrixOps.matrix_print(G2);
-	        	 System.out.println("****************");
-	        	 matrixSize = 5;
+	        	 matrixSize = G2.length;
 	         } else G2 = MatrixOps.fill(new int[matrixSize][matrixSize],0.7);
 
 	        /*
@@ -61,13 +60,14 @@ public class Prover {
 	         String G1_string = MatrixOps.convertToString(G1);
 	         FastFileWriter.WriteToFormattedFile("G1_subgraphOfG2.txt", G1_string); 
 	         Communication.sendBuffer(socket,G1_string);
-	         System.out.println("Ignore Comfirmation" +Communication.receiveBuffer(socket));  //In case any package gets lost during transportation
+	         Thread.sleep(50);
+	         //System.out.println("Ignore Comfirmation" +Communication.receiveBuffer(socket));  //In case any package gets lost during transportation
 	         String G2_string = MatrixOps.convertToString(G2);
 	         FastFileWriter.WriteToFormattedFile("G2_graph.txt", G2_string);  
 	         Communication.sendBuffer(socket,G2_string);	         
 	         int Number_run = 0; 
 	         
-	         while (Number_run < 5) {
+	         while (Number_run < 50) {
 	        	 Number_run ++;
 	        	 System.out.println("Run " + Number_run);
 		         // Generate G3, the permuted version of G2
@@ -90,13 +90,13 @@ public class Prover {
 		        	 String G3_string = MatrixOps.convertToString(G3);
 		        	 Communication.sendBuffer(socket,G3_string);
 		        	 System.out.println("Sent to verifier: G3 (in bit = 0) " + G3_string);
-		        	 Communication.receiveBuffer(socket);
+		        	 Thread.sleep(50);
 		        	 System.out.println("Printing P3");
 			         MatrixOps.matrix_print(P3);
 		        	 String P3_string = MatrixOps.convertToString(P3);
 		        	 Communication.sendBuffer(socket,P3_string);
 		        	 System.out.println("Sent to verifier: P3 (in bit = 0) " + P3_string);
-		        	 Communication.receiveBuffer(socket);
+		        	 Thread.sleep(50);
 		        	 
 		        	 String pass = Communication.receiveBuffer(socket);
 		        	 if (pass.equals("-1")) {
@@ -119,12 +119,15 @@ public class Prover {
 	   	        	 System.out.println("Printing Pi");
 			         MatrixOps.matrix_print(Pi);
 		        	 Communication.sendBuffer(socket, MatrixOps.convertToString(Pi));
-		        	 Communication.receiveBuffer(socket);
+		        	 //System.out.println("Ignore Comfirmation" +Communication.receiveBuffer(socket));
+		        	 Thread.sleep(50);
 		        	 Communication.sendBuffer(socket,MatrixOps.convertToString(Qprime)); 
-		        	 Communication.receiveBuffer(socket);
+		        	 Thread.sleep(50);
+		        	 //System.out.println("Ignore Comfirmation" +Communication.receiveBuffer(socket));
 		        	 //Send Qprimeprime
-		        	 Communication.sendBuffer(socket,MatrixOps.convertToString(Qprimeprime)); 
-		        	 Communication.receiveBuffer(socket);
+		        	 Communication.sendBuffer(socket,MatrixOps.convertToString(Qprimeprime));
+		        	 Thread.sleep(50);
+		        	 //System.out.println("Ignore Comfirmation" +Communication.receiveBuffer(socket));
 		        	 String pass = Communication.receiveBuffer(socket);
 		        	 if (pass.equals("-1")) {
 		        		 System.out.println("Failed in " + Number_run + ".");
