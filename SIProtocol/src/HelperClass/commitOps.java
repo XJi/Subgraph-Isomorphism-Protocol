@@ -84,8 +84,8 @@ public class commitOps {
 		String out = "";
 		for(int i =0; i < len;i++){
 			BigInteger I = singleRowHash(G,i);
-			out += new String(I.toByteArray());
-			out += "\n";
+			out = out+ I;
+			
 		}
 		return out;
 		

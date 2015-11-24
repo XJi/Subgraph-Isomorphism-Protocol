@@ -31,7 +31,6 @@ public class Verifier {
         String g1_string = Communication.receiveBuffer(socket);
         Communication.sendBuffer(socket, "1");
         String g2_string = Communication.receiveBuffer(socket);
-        Communication.sendBuffer(socket, "1");
         g1 = MatrixOps.convertToMatrix(g1_string);
         g2 = MatrixOps.convertToMatrix(g2_string);
         		
@@ -45,11 +44,13 @@ public class Verifier {
             	
             	/* Receive commitment(Q) */
                 String Commitment_q = Communication.receiveBuffer(socket);
-                
+                System.out.println("The com_Q is:"+ Commitment_q);
                 /*Send a random bit to prover and wait for prover's reply*/
-                int bit = (int)(Math.random()+0.5);
+                int bit = 0;
+                Communication.sendBuffer(socket, ""+bit);
+                /*int bit = (int)(Math.random()+0.5);
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                out.println(bit);
+                out.println(bit);*/
               
                 
                 if (bit == 0) {
@@ -61,6 +62,7 @@ public class Verifier {
                 	int[][] P3 = MatrixOps.convertToMatrix(msg2);
                 	boolean didCommit = commitOps.checkCommit(Commitment_q,G3);
                 	if (!didCommit) {
+                		System.out.println("Failed in checkCommit(Commitment_q,G3) in bit = 0\n");
                 		Communication.sendBuffer(socket, "-1");  
                 		fail = true;
                 		break;
@@ -69,6 +71,7 @@ public class Verifier {
                 	boolean pass = commitOps.areEqual(Q,G3);
                 	if (!pass) {
                 		Communication.sendBuffer(socket, "-1");  
+                		System.out.println("Failed in commitOps.areEqual(Q,G3) in bit = 0\n");
                 		fail = true;
                 		break;
                 	}
@@ -83,6 +86,7 @@ public class Verifier {
                 	boolean didCommit = commitOps.checkCommit(Commitment_q, Qprime);
                 	if (!didCommit) {
                 		Communication.sendBuffer(socket, "-1");  
+                		System.out.println("Failed in checkCommit(Commitment_q, Qprime) in bit = 1\n");
                 		fail = true;
                 		break;
                 	}
@@ -90,6 +94,7 @@ public class Verifier {
                 	boolean pass = commitOps.areEqual(Qcheck,Qprime);
                 	if (!pass) {
                 		Communication.sendBuffer(socket, "-1");  
+                		System.out.println("Failed in areEqual(Qcheck,Qprime) in bit = 1\n");
                 		fail = true;
                 		break;
                 	}

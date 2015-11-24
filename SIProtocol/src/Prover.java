@@ -55,7 +55,7 @@ public class Prover {
 	         String G1_string = MatrixOps.convertToString(G1);
 	         FastFileWriter.WriteToFormattedFile("G1_subgraphOfG2.txt", G1_string); 
 	         Communication.sendBuffer(socket,G1_string);
-	         Communication.receiveBuffer(socket);   //In case any package gets lost during transportation
+	         System.out.println("Ignore Comfirmation" +Communication.receiveBuffer(socket));  //In case any package gets lost during transportation
 	         String G2_string = MatrixOps.convertToString(G2);
 	         FastFileWriter.WriteToFormattedFile("G2_graph.txt", G2_string);  
 	         Communication.sendBuffer(socket,G2_string);	         
@@ -76,6 +76,7 @@ public class Prover {
 		         //Receive the challenge
 		         String bitStr = Communication.receiveBuffer(socket); 
 		         int bit = Integer.parseInt(bitStr);
+		         System.out.println("Prover receives"+bit);
 		         if(bit == 0){
 		        	 /* --Send G3 and P3 --*/
 		        	 String G3_string = MatrixOps.convertToString(G3);
@@ -85,7 +86,7 @@ public class Prover {
 		        	 String P3_string = MatrixOps.convertToString(P3);
 		        	 Communication.sendBuffer(socket,P3_string);
 		        	 Communication.sendBuffer(socket, MatrixOps.convertToString(P3));
-		        	 System.out.println("Sent to verifier: G3 (in bit = 0) " + P3_string);
+		        	 System.out.println("Sent to verifier: P3 (in bit = 0) " + P3_string);
 		        	 Communication.receiveBuffer(socket);
 		        	 
 		        	 String pass = Communication.receiveBuffer(socket);
