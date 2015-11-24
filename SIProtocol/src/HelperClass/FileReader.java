@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-
+import HelperClass.MatrixOps;
 public class FileReader {
 	/*
 	 * Read graph from the given file path. filePath is relative path. 
@@ -22,16 +22,20 @@ public class FileReader {
 			input.add(s);
 		br.close();
 		int graphSize = input.size();
+		System.out.println("Graphsize: "+ graphSize);
 		int[][] adjMatrix = new int[graphSize][graphSize];
 		for(int i = 0; i < graphSize; i++){
 			String temp = input.get(i);
-			for(int j = 0; j < graphSize; j++){
+			int k = 0;
+			for(int j = 0; j < temp.length(); j++){
 				if(temp.charAt(j)!= ' ') {
-					adjMatrix[i][j] = Character.getNumericValue(temp.charAt(j));
+					adjMatrix[i][k++] = Character.getNumericValue(temp.charAt(j));
 				}
 			}
 		}
+		//MatrixOps.matrix_print(adjMatrix);
 		return adjMatrix;
 	}
+
 }
 

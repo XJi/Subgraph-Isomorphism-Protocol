@@ -32,8 +32,11 @@ public class Verifier {
         Communication.sendBuffer(socket, "1");
         String g2_string = Communication.receiveBuffer(socket);
         g1 = MatrixOps.convertToMatrix(g1_string);
+        System.out.println("Printing G1 now");
+        MatrixOps.matrix_print(g1);
         g2 = MatrixOps.convertToMatrix(g2_string);
-        		
+        System.out.println("Printing G2 now");
+        MatrixOps.matrix_print(g2);		
         Number_run = 0;
         try {
             while (Number_run < 5) {
@@ -60,6 +63,8 @@ public class Verifier {
                 	Communication.sendBuffer(socket, "1");
                 	int[][] G3 = MatrixOps.convertToMatrix(msg1);
                 	int[][] P3 = MatrixOps.convertToMatrix(msg2);
+   		         System.out.println("Printing G3");
+   		         MatrixOps.matrix_print(G3);
                 	boolean didCommit = commitOps.checkCommit(Commitment_q,G3);
                 	if (!didCommit) {
                 		System.out.println("Failed in checkCommit(Commitment_q,G3) in bit = 0\n");

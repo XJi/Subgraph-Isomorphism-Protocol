@@ -23,7 +23,7 @@ import HelperClass.FastFileWriter;
 public class Prover {
 	 private static Socket socket;
 	 static int[][] matrix;
-	 static int[][] G2;
+	 //static int[][] G2;
 	 
 	 public static void main(String args[]){
 	     try {
@@ -34,10 +34,15 @@ public class Prover {
 	         System.out.println("Enter the size of the adjacency matrix or enter 0 for reading given files\n");
 	         int matrixSize =Integer.parseInt(in.nextLine());
 	         // Generate G2
-	         
+	         int[][] G2;
 	         if (matrixSize == 0) {  // read from file
+	        	 System.out.println("Reading from the file");
 	        	 String file_G2 = "/g2";
 	        	 G2 = FileReader.readGraph(file_G2);
+	        	 System.out.println("Printing G2");
+	        	 MatrixOps.matrix_print(G2);
+	        	 System.out.println("****************");
+	        	 matrixSize = 5;
 	         } else G2 = MatrixOps.fill(new int[matrixSize][matrixSize],0.7);
 
 	        /*
@@ -49,7 +54,8 @@ public class Prover {
 	         int[][] G1 = MatrixOps.multiply(R,G2);
 	         G1 = MatrixOps.multiply(G1,R);
 	         G1 = MatrixOps.permute(G1,P1);
-	          
+	         System.out.println("Printing G1");
+	         MatrixOps.matrix_print(G1);
 	         /* -- SEND G1, G2 TO VERIFIER -- */
 	         
 	         String G1_string = MatrixOps.convertToString(G1);
@@ -67,7 +73,8 @@ public class Prover {
 		         // Generate G3, the permuted version of G2
 		         int[][] P3 = MatrixOps.perm_mat(matrixSize);
 		         int[][] G3 = MatrixOps.permute(G2,P3);
-		         
+		         System.out.println("Printing G3");
+		         MatrixOps.matrix_print(G3);
 		         // Send commitment
 		         String commitString = commitOps.graphCommit(G3);
 		         Communication.sendBuffer(socket,commitString);
@@ -85,7 +92,6 @@ public class Prover {
 		        	 Communication.receiveBuffer(socket);
 		        	 String P3_string = MatrixOps.convertToString(P3);
 		        	 Communication.sendBuffer(socket,P3_string);
-		        	 Communication.sendBuffer(socket, MatrixOps.convertToString(P3));
 		        	 System.out.println("Sent to verifier: P3 (in bit = 0) " + P3_string);
 		        	 Communication.receiveBuffer(socket);
 		        	 

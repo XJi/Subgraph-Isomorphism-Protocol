@@ -45,12 +45,26 @@ public class MatrixOps {
 	 * @param buffer
 	 * @return 2D adjacency matrix
 	 */
-	public static int[][] convertToMatrix(String buffer){	
+	public static int[][] convertToMatrixInt(String buffer){	
 		int size = (int)Math.sqrt(buffer.length());
 		int[][] adjMatrix = new int[size][size];
 		for(int i = 0; i < size; i++){
 			for(int j = 0; j < size; j++)
 				adjMatrix[i][j] = (int)buffer.charAt(i*size+j);
+		}
+		return adjMatrix;
+	}
+	/**
+	 * Convert the received buffer to an adjacency matrix
+	 * @param buffer
+	 * @return 2D adjacency matrix
+	 */
+	public static int[][] convertToMatrix(String buffer){	
+		int size = (int)Math.sqrt(buffer.length());
+		int[][] adjMatrix = new int[size][size];
+		for(int i = 0; i < size; i++){
+			for(int j = 0; j < size; j++)
+				adjMatrix[i][j] = (int)(buffer.charAt(i*size+j)-48);
 		}
 		return adjMatrix;
 	}
@@ -86,8 +100,7 @@ public class MatrixOps {
 		//filling the matrix by taking a random bit at each step and then OR-ing it with the current entry. This will allow us to reuse
 		// the function on already-filled matrices so as to randomly add edges to the graph
 		for(int i=0; i < A[0].length;i++){
-			for(int j = 0; j <= i; j++){
-				
+			for(int j = 0; j <= i; j++){			
 				// Here we initialize a random between 0,1, if the random is less than a fixed "p" then the bit becomes 1. 
 				// This allows us to set the probability with which we add an edge.
 				r = Math.random();
@@ -101,9 +114,9 @@ public class MatrixOps {
 				A[j][i] = A[i][j];
 			}
 		}
-		for(int i = 0; i < A[0].length;i++){
+		/*for(int i = 0; i < A[0].length;i++){
 			System.out.println(Arrays.toString(A[i]));
-		}
+		}*/
 		
 		if(isEmpty(A)){
 			A = fill(A,p);
@@ -139,9 +152,11 @@ public class MatrixOps {
 	
     // print to screen matrix
     public static void matrix_print(int[][] A){
-    	for(int i = 0; i < A[0].length;i++){
-    		System.out.println(Arrays.toString(A[i]));
-    	}
+    	for(int i = 0; i < A.length; i++){
+   		 for(int j = 0; j < A[0].length; j++)
+   			 System.out.print(A[i][j]);
+   		 System.out.print("\n");
+   	 }
     }
     /*public static int[][] matrix_read(String[] arg){
     	
@@ -180,7 +195,7 @@ public class MatrixOps {
     		P[j][i] = 1;
     	}
     	//System.out.println("Permutation Matix Created: ");
-    	matrix_print(P);
+    	//matrix_print(P);
     	return P;
     }
     
