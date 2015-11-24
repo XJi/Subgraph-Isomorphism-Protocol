@@ -69,7 +69,7 @@ public class Prover {
 	         
 	         while (Number_run < 5) {
 	        	 Number_run ++;
-	        	 
+	        	 System.out.println("Run " + Number_run);
 		         // Generate G3, the permuted version of G2
 		         int[][] P3 = MatrixOps.perm_mat(matrixSize);
 		         int[][] G3 = MatrixOps.permute(G2,P3);
@@ -79,6 +79,7 @@ public class Prover {
 		         String commitString = commitOps.graphCommit(G3);
 		         Communication.sendBuffer(socket,commitString);
 		         System.out.println("Sent to verifier: Commitment of G3 " + commitString);
+	        	 System.out.println("Printing hash:  "+commitString);
 		         
 		         //Receive the challenge
 		         String bitStr = Communication.receiveBuffer(socket); 
@@ -90,6 +91,8 @@ public class Prover {
 		        	 Communication.sendBuffer(socket,G3_string);
 		        	 System.out.println("Sent to verifier: G3 (in bit = 0) " + G3_string);
 		        	 Communication.receiveBuffer(socket);
+		        	 System.out.println("Printing P3");
+			         MatrixOps.matrix_print(P3);
 		        	 String P3_string = MatrixOps.convertToString(P3);
 		        	 Communication.sendBuffer(socket,P3_string);
 		        	 System.out.println("Sent to verifier: P3 (in bit = 0) " + P3_string);
@@ -102,16 +105,26 @@ public class Prover {
 		        	 }
 		         }
 		         else{
-		        	  /* Send Qprime, Pi */
+		        	 
+		        	 //System.out.println("Printing G3 now: ");
+		        	 //MatrixOps.matrix_print(G3);
+		        	 /* Send Qprime, Pi */
 		        	 int[][] Pi = MatrixOps.multiply(P3,MatrixOps.transpose(P1));
 		        	 /* -- Compute Qprime -- */
 		        	 int[][] Qprime = MatrixOps.permute(G1, Pi);
+		        	 int[][] Qprimeprime = commitOps.QPFill(Qprime, G3);				        	 
 		        	 /* -- Send Qprime, Pi --*/
+	   		         	System.out.println("Printing QPrime");
+	   		         	MatrixOps.matrix_print(Qprime);
+	   	        	 System.out.println("Printing Pi");
+			         MatrixOps.matrix_print(Pi);
 		        	 Communication.sendBuffer(socket, MatrixOps.convertToString(Pi));
 		        	 Communication.receiveBuffer(socket);
 		        	 Communication.sendBuffer(socket,MatrixOps.convertToString(Qprime)); 
 		        	 Communication.receiveBuffer(socket);
-		        	 
+		        	 //Send Qprimeprime
+		        	 Communication.sendBuffer(socket,MatrixOps.convertToString(Qprimeprime)); 
+		        	 Communication.receiveBuffer(socket);
 		        	 String pass = Communication.receiveBuffer(socket);
 		        	 if (pass.equals("-1")) {
 		        		 System.out.println("Failed in " + Number_run + ".");

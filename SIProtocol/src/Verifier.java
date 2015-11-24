@@ -47,15 +47,10 @@ public class Verifier {
             	
             	/* Receive commitment(Q) */
                 String Commitment_q = Communication.receiveBuffer(socket);
-                System.out.println("The com_Q is:"+ Commitment_q);
+                System.out.println("The com_Q is:"+ Commitment_q+"aa");
                 /*Send a random bit to prover and wait for prover's reply*/
-                int bit = 0;
-                Communication.sendBuffer(socket, ""+bit);
-                /*int bit = (int)(Math.random()+0.5);
-                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                out.println(bit);*/
-              
-                
+                int bit = 1;//(int)(Math.random()+0.5);
+                Communication.sendBuffer(socket, ""+bit);                
                 if (bit == 0) {
                 	String msg1 = Communication.receiveBuffer(socket);	// G3
                 	Communication.sendBuffer(socket, "1");
@@ -63,8 +58,12 @@ public class Verifier {
                 	Communication.sendBuffer(socket, "1");
                 	int[][] G3 = MatrixOps.convertToMatrix(msg1);
                 	int[][] P3 = MatrixOps.convertToMatrix(msg2);
-   		         System.out.println("Printing G3");
-   		         MatrixOps.matrix_print(G3);
+                	
+   		         	System.out.println("Printing G3");
+   		         	MatrixOps.matrix_print(G3);
+   	        	 System.out.println("Printing P3");
+		         MatrixOps.matrix_print(P3);
+		            System.out.println("Printing hash of G3: "+commitOps.graphCommit(G3)+"aa");
                 	boolean didCommit = commitOps.checkCommit(Commitment_q,G3);
                 	if (!didCommit) {
                 		System.out.println("Failed in checkCommit(Commitment_q,G3) in bit = 0\n");
@@ -80,18 +79,29 @@ public class Verifier {
                 		fail = true;
                 		break;
                 	}
+                	Communication.sendBuffer(socket, "0"); 
                 	
                 } else {
-                	String msg1 = Communication.receiveBuffer(socket);	//Qprime
-                	Communication.sendBuffer(socket, "1");
-                	String msg2 = Communication.receiveBuffer(socket);  //Pi
-                	Communication.sendBuffer(socket, "1");
-                	int[][] Qprime = MatrixOps.convertToMatrix(msg1);
+                  	String msg2 = Communication.receiveBuffer(socket);  //Pi
                 	int[][] Pi = MatrixOps.convertToMatrix(msg2);
-                	boolean didCommit = commitOps.checkCommit(Commitment_q, Qprime);
+                	Communication.sendBuffer(socket, "1");
+                	String msg1 = Communication.receiveBuffer(socket);	//Qprime
+                	int[][] Qprime = MatrixOps.convertToMatrix(msg1);
+                	Communication.sendBuffer(socket, "1");
+                	// receive Qprimeprime
+                	String msg3 = Communication.receiveBuffer(socket);	//Qprimeprime
+                	int[][] Qprimeprime = MatrixOps.convertToMatrix(msg3);
+                	Communication.sendBuffer(socket, "1");
+   		         	System.out.println("Printing QPrime");
+   		         	MatrixOps.matrix_print(Qprime);
+   	        	 System.out.println("Printing Pi");
+		         MatrixOps.matrix_print(Pi);
+		         //System.out.println("Printing hash of qprime");
+		         
+                	boolean didCommit = commitOps.checkCommit(Commitment_q, Qprimeprime);
                 	if (!didCommit) {
                 		Communication.sendBuffer(socket, "-1");  
-                		System.out.println("Failed in checkCommit(Commitment_q, Qprime) in bit = 1\n");
+                		System.out.println("Failed in checkCommit(Commitment_q, Qprimeprime) in bit = 1\n");
                 		fail = true;
                 		break;
                 	}
@@ -103,7 +113,7 @@ public class Verifier {
                 		fail = true;
                 		break;
                 	}
-                	
+                	Communication.sendBuffer(socket, "0"); 
                 }
             }
             if(fail) {

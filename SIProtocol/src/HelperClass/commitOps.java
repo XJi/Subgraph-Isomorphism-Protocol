@@ -121,10 +121,26 @@ public class commitOps {
 		for(int i = 0; i < rowList.length; i++){
 			if(rowList[i]==1){
 				BigInteger I = singleRowHash(QP,i);
-				String checkString = new String(I.toByteArray());
+				String checkString = ""+I;
+				System.out.println(checkString + "\n");
 				booltemp = commit.contains(checkString);
 				out = out && booltemp;
+				
 			}
+		}
+		return out;
+	}
+	
+	public static int[][] QPFill(int[][] QP, int[][]G3){
+		int[][] out = new int[QP[0].length][QP[0].length];
+		int[] rowList = openList(QP);
+		for(int i =0; i < rowList.length;i++){
+			if(rowList[i]==1){
+				for(int j = 0; j < QP[i].length;j++){
+					out[i][j] = Integer.max(QP[i][j], G3[i][j]);
+				}
+			}
+			
 		}
 		return out;
 	}
