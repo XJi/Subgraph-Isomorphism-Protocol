@@ -29,7 +29,6 @@ public class Verifier {
         ServerSocket serverSocket = new ServerSocket(SERVERPORT);
         socket = serverSocket.accept();
         String g1_string = Communication.receiveBuffer(socket);
-       // Communication.sendBuffer(socket, "1");
         Thread.sleep(50);
         String g2_string = Communication.receiveBuffer(socket);
         g1 = MatrixOps.convertToMatrix(g1_string);
@@ -48,16 +47,14 @@ public class Verifier {
             	
             	/* Receive commitment(Q) */
                 String Commitment_q = Communication.receiveBuffer(socket);
-                System.out.println("The com_Q is:"+ Commitment_q+"aa");
+                
                 /*Send a random bit to prover and wait for prover's reply*/
                 int bit = (int)(Math.random()+0.5);
                 Communication.sendBuffer(socket, ""+bit);                
                 if (bit == 0) {
                 	String msg1 = Communication.receiveBuffer(socket);	// G3
-                	//Communication.sendBuffer(socket, "1");
                 	Thread.sleep(50);
                 	String msg2 = Communication.receiveBuffer(socket);  // P3
-                	//Communication.sendBuffer(socket, "1");
                 	Thread.sleep(50);
                 	int[][] G3 = MatrixOps.convertToMatrix(msg1);
                 	int[][] P3 = MatrixOps.convertToMatrix(msg2);
@@ -94,7 +91,6 @@ public class Verifier {
                 	String msg3 = Communication.receiveBuffer(socket);	//Qprimeprime
                 	int[][] Qprimeprime = MatrixOps.convertToMatrix(msg3);
                 	Thread.sleep(50);
-                	//Communication.sendBuffer(socket, "1");
 		         
                 	boolean didCommit = commitOps.checkCommit(Commitment_q, Qprimeprime);
                 	if (!didCommit) {

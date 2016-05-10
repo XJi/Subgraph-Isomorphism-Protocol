@@ -23,7 +23,6 @@ import HelperClass.FastFileWriter;
 public class Prover {
 	 private static Socket socket;
 	 static int[][] matrix;
-	 //static int[][] G2;
 	 
 	 public static void main(String args[]){
 	     try {
@@ -114,26 +113,24 @@ public class Prover {
 		        	 int[][] Qprime = MatrixOps.permute(G1, Pi);
 		        	 int[][] Qprimeprime = commitOps.QPFill(Qprime, G3);				        	 
 		        	 /* -- Send Qprime, Pi --*/
-	   		         	System.out.println("Printing QPrime");
-	   		         	MatrixOps.matrix_print(Qprime);
-	   	        	 System.out.println("Printing Pi");
+	   		         System.out.println("Printing QPrime and Pi");
+	   		         MatrixOps.matrix_print(Qprime);
 			         MatrixOps.matrix_print(Pi);
 		        	 Communication.sendBuffer(socket, MatrixOps.convertToString(Pi));
-		        	 //System.out.println("Ignore Comfirmation" +Communication.receiveBuffer(socket));
 		        	 Thread.sleep(50);
 		        	 Communication.sendBuffer(socket,MatrixOps.convertToString(Qprime)); 
 		        	 Thread.sleep(50);
-		        	 //System.out.println("Ignore Comfirmation" +Communication.receiveBuffer(socket));
+
 		        	 //Send Qprimeprime
 		        	 Communication.sendBuffer(socket,MatrixOps.convertToString(Qprimeprime));
 		        	 Thread.sleep(50);
-		        	 //System.out.println("Ignore Comfirmation" +Communication.receiveBuffer(socket));
 		        	 String pass = Communication.receiveBuffer(socket);
 		        	 if (pass.equals("-1")) {
 		        		 System.out.println("Failed in " + Number_run + ".");
 		        		 break;
 		        	 }
 		         }
+		         in.close();
 	         }
 	     }
 	      catch (Exception exception){
